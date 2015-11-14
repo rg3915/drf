@@ -1,0 +1,20 @@
+\documentclass[tikz]{standalone}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{tikz-uml}
+
+\begin{document}
+
+\begin{tikzpicture}[>=latex]
+
+\umlclass[x=0,y=0]{Person}{
+	- first\_name \\
+	- last\_name \\
+	- email \\
+	- active \\
+	- created \\
+}{}
+	
+\end{tikzpicture}
+
+\end{document}
