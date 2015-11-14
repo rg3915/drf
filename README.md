@@ -187,42 +187,165 @@ A desserialização é similar.
 # True
 >>> serializer.validated_data
 # OrderedDict([('first_name', 'Regis'), ('last_name', 'Santos'), ('email', 'regis@email.com'), ('active', True), ('created', datetime.datetime(2015, 11, 14, 18, 26, 42, 776285, tzinfo=<UTC>))])
->>> serializer = PersonSerializer()
->>> print(repr(serializer))
-# PersonSerializer():
-#     pk = IntegerField(read_only=True)
-#     first_name = CharField(max_length=30)
-#     last_name = CharField(max_length=30)
-#     email = EmailField()
-#     active = BooleanField(default=True)
-#     created = DateTimeField()
 ```
 
 ## Step-2 ModelSerializer
 
+Nossa classe `PersonSerializer` está replicando um monte de informações que está contido no modelo `Person`. 
+
+Da mesma forma que o Django fornece `Form` e `ModelForm`, REST framework inclui as classes `Serializer` e `ModelSerializer`.
+
+Vamos refatorar nosso arquivo `serializers.py`, que agora ficará assim:
+
+```python
+from rest_framework import serializers
+from core.models import Person
+
+class PersonSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Person
+        fields = ('pk', 'first_name', 'last_name','email', 'active', 'created')
+```
+
+Uma propriedade legal que a serialização tem é que você pode inspecionar todos os campos em uma instância serializer, imprimindo sua representação. Abra o `shell` do Django.
+
+```bash
+$ ./manage.py shell
+```
+
+```python
+>>> from core.serializers import PersonSerializer
+>>> serializer = PersonSerializer()
+>>> print(repr(serializer))
+# PersonSerializer():
+#     pk = IntegerField(label='ID', read_only=True)
+#     first_name = CharField(max_length=30)
+#     last_name = CharField(max_length=30)
+#     email = EmailField(allow_blank=True, allow_null=True, max_length=254, required=False)
+#     active = BooleanField(required=False)
+#     created = DateTimeField(read_only=True)
+```
+
+É importante lembrar que as classes `ModelSerializer` não faz nenhuma mágica, são simplesmente um atalho para a criação das classes de serialização:
+
+* Os campos são definidos automaticamente.
+* Os métodos `create()` e `update()` são implementados por padrão de uma forma simplificada.
 
 
 
+### `views.py`: Criando *views* regulares usando nosso *Serializer*
+
+Vamos criar uma *view* simples para visualizar os dados em `json`.
+
+Edite o arquivo `views.py`
+
+```python
+from django.http import HttpResponse
+from django.views.decorators.csrf import csrf_exempt
+from rest_framework.renderers import JSONRenderer
+from rest_framework.parsers import JSONParser
+from core.models import Person
+from core.serializers import PersonSerializer
+
+class JSONResponse(HttpResponse):
+    """
+    An HttpResponse that renders its content into JSON.
+    """
+
+    def __init__(self, data, **kwargs):
+        content = JSONRenderer().render(data)
+        kwargs['content_type'] = 'application/json'
+        super(JSONResponse, self).__init__(content, **kwargs)
+```
+
+A raiz da nossa API será uma lista de todas as pessoas, ou podemos criar uma pessoa nova.
 
 
+```python
+@csrf_exempt
+def person_list(request):
+    """
+    List all persons, or create a new person.
+    """
+    if request.method == 'GET':
+        persons = Person.objects.all()
+        serializer = PersonSerializer(persons, many=True)
+        return JSONResponse(serializer.data)
 
+    elif request.method == 'POST':
+        data = JSONParser().parse(request)
+        serializer = PersonSerializer(data=data)
+        if serializer.is_valid():
+            serializer.save()
+            return JSONResponse(serializer.data, status=201)
+        return JSONResponse(serializer.errors, status=400)
+```
 
+Note que nós queremos usar o POST mas não temos o CSRF Token, por isso usamos o `@csrf_exempt`.
 
+Também vamos precisar visualizar os detalhes de cada pessoa. Assim podemos recuperar, atualizar ou deletar cada registro.
 
+```python
+@csrf_exempt
+def person_detail(request, pk):
+    """
+    Retrieve, update or delete a person.
+    """
+    try:
+        person = Person.objects.get(pk=pk)
+    except Person.DoesNotExist:
+        return HttpResponse(status=404)
 
+    if request.method == 'GET':
+        serializer = PersonSerializer(person)
+        return JSONResponse(serializer.data)
 
+    elif request.method == 'PUT':
+        data = JSONParser().parse(request)
+        serializer = PersonSerializer(person, data=data)
+        if serializer.is_valid():
+            serializer.save()
+            return JSONResponse(serializer.data)
+        return JSONResponse(serializer.errors, status=400)
 
+    elif request.method == 'DELETE':
+        person.delete()
+        return HttpResponse(status=204)
+```
 
+Agora, vamos criar as urls. Crie um novo arquivo `core/urls.py`.
 
+```python
+from django.conf.urls import url
+from core import views
+
+urlpatterns = [
+    url(r'^persons/$', views.person_list),
+    url(r'^persons/(?P<pk>[0-9]+)/$', views.person_detail),
+]
+```
+
+E acrescente a seguinte linha em `myproject/urls.py`.
+
+```python
+urlpatterns = [
+	url(r'^', include('core.urls')),
+    url(r'^admin/', include(admin.site.urls)),
+]
+```
 
 ## Instalando `httpie`
 
 ```bash
 $ sudo pip install httpie
-$ http http://127.0.0.1:8000/persons/
 ```
 
+Vamos usar o `httpie` digitando
 
+```bash
+$ http http://127.0.0.1:8000/persons/
+```
 
 
 
