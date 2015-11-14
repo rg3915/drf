@@ -76,7 +76,7 @@ class Person(models.Model):
 
 
 
-### `serializers.py`: Criando `CoreSerializer`
+### `serializers.py`: Criando `PersonSerializer`
 
 Precisamos proporcionar uma forma de [serialização][5] e desserialização das instâncias de `person` em uma representação JSON.
 
@@ -90,7 +90,7 @@ Edite
 from rest_framework import serializers
 from core.models import Person
 
-class CoreSerializer(serializers.Serializer):
+class PersonSerializer(serializers.Serializer):
     pk = serializers.IntegerField(read_only=True)
     first_name = serializers.CharField(max_length=30)
     last_name = serializers.CharField(max_length=30)
@@ -143,7 +143,7 @@ Primeiro vamos criar uma pessoa.
 
 ```python
 >>> from core.models import Person
->>> from core.serializers import CoreSerializer
+>>> from core.serializers import PersonSerializer
 >>> from rest_framework.renderers import JSONRenderer
 >>> from rest_framework.parsers import JSONParser
 
@@ -154,7 +154,7 @@ Primeiro vamos criar uma pessoa.
 Agora que já temos alguns dados podemos ver a serialização da última instância.
 
 ```python
->>> serializer = CoreSerializer(person)
+>>> serializer = PersonSerializer(person)
 >>> serializer.data
 # {'active': True, 'pk': 1, 'last_name': 'Santos', 'created': '2015-11-14T18:26:42.776285Z', 'first_name': 'Regis', 'email': 'regis@email.com'}
 ```
@@ -172,24 +172,24 @@ A desserialização é similar.
 
 ```python
 >>> from core.models import Person
->>> from core.serializers import CoreSerializer
+>>> from core.serializers import PersonSerializer
 >>> from rest_framework.renderers import JSONRenderer
 >>> from rest_framework.parsers import JSONParser
 >>> from django.utils.six import BytesIO
 
 >>> person = Person.objects.get(pk=1)
->>> serializer = CoreSerializer(person)
+>>> serializer = PersonSerializer(person)
 >>> content = JSONRenderer().render(serializer.data)
 >>> stream = BytesIO(content)
 >>> data = JSONParser().parse(stream)
->>> serializer = CoreSerializer(data=data)
+>>> serializer = PersonSerializer(data=data)
 >>> serializer.is_valid()
 # True
 >>> serializer.validated_data
 # OrderedDict([('first_name', 'Regis'), ('last_name', 'Santos'), ('email', 'regis@email.com'), ('active', True), ('created', datetime.datetime(2015, 11, 14, 18, 26, 42, 776285, tzinfo=<UTC>))])
->>> serializer = CoreSerializer()
+>>> serializer = PersonSerializer()
 >>> print(repr(serializer))
-# CoreSerializer():
+# PersonSerializer():
 #     pk = IntegerField(read_only=True)
 #     first_name = CharField(max_length=30)
 #     last_name = CharField(max_length=30)

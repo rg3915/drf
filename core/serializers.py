@@ -2,7 +2,7 @@ from rest_framework import serializers
 from core.models import Person
 
 
-class CoreSerializer(serializers.Serializer):
+class PersonSerializer(serializers.Serializer):
     pk = serializers.IntegerField(read_only=True)
     first_name = serializers.CharField(max_length=30)
     last_name = serializers.CharField(max_length=30)
