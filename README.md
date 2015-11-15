@@ -10,7 +10,7 @@ Pra quem não sabe, para usar API Web usamos REST, no caso, [Django Rest Framewo
 
 Então para criar a API, no meu caso, eu usei:
 
-* Ambiente: venv
+* Ambiente: env
 * Projeto: myproject
 * App: core
 * Model: Person
@@ -22,12 +22,15 @@ Então para criar a API, no meu caso, eu usei:
 ## Configurando um novo ambiente
 
 ```bash
-$ virtualenv venv # python 2, ou
-$ # virtualenv -p python3 venv # python 3
-$ source venv/bin/activate
-$ git clone https://github.com/rg3915/drf.git
-$ cd drf
-$ pip install -r requirements.txt
+$ virtualenv env # python 2, ou
+$ # virtualenv -p python3 env # python 3
+$ source env/bin/activate
+$ mkdir drf; cd drf
+$ django-admin.py startproject myproject .
+$ python manage.py core
+$ pip install Django==1.8.6 djangorestframework==3.3.1
+$ pip install django-filter drf-nested-routers
+$ pip freeze > requirements.txt
 ```
 
 Veja o requirements.txt
@@ -147,7 +150,10 @@ Primeiro vamos criar uma pessoa.
 >>> from rest_framework.renderers import JSONRenderer
 >>> from rest_framework.parsers import JSONParser
 
->>> person = Person(first_name='Regis', last_name='Santos',email='regis@email.com')
+>>> person = Person(first_name='Paul', last_name='Van Dyke', email='paul@email.com')
+>>> person.save()
+
+>>> person = Person(first_name='Regis', last_name='Santos', email='regis@email.com')
 >>> person.save()
 ```
 
@@ -156,7 +162,7 @@ Agora que já temos alguns dados podemos ver a serialização da última instân
 ```python
 >>> serializer = PersonSerializer(person)
 >>> serializer.data
-# {'active': True, 'pk': 1, 'last_name': 'Santos', 'created': '2015-11-14T18:26:42.776285Z', 'first_name': 'Regis', 'email': 'regis@email.com'}
+# {'pk': 2, 'first_name': 'Regis', 'created': '2015-11-15T03:20:25.084990Z', 'last_name': 'Santos', 'email': 'regis@email.com', 'active': True}
 ```
 
 Neste ponto nós traduzimos a instância do modelo em tipos de dados nativos do Python. Para finalizar o processo de serialização nós vamos renderizar os dados em `json`.
@@ -164,7 +170,7 @@ Neste ponto nós traduzimos a instância do modelo em tipos de dados nativos do 
 ```python
 >>> content = JSONRenderer().render(serializer.data)
 >>> content
-# b'{"pk":1,"first_name":"Regis","last_name":"Santos","email":"regis@email.com","active":true,"created":"2015-11-14T18:26:42.776285Z"}'
+# b'{"pk":2,"first_name":"Regis","last_name":"Santos","email":"regis@email.com","active":true,"created":"2015-11-15T03:20:25.084990Z"}'
 ```
 
 
@@ -186,7 +192,7 @@ A desserialização é similar.
 >>> serializer.is_valid()
 # True
 >>> serializer.validated_data
-# OrderedDict([('first_name', 'Regis'), ('last_name', 'Santos'), ('email', 'regis@email.com'), ('active', True), ('created', datetime.datetime(2015, 11, 14, 18, 26, 42, 776285, tzinfo=<UTC>))])
+# OrderedDict([('first_name', 'Paul'), ('last_name', 'Van Dyke'), ('email', 'paul@email.com'), ('active', True)])
 ```
 
 ## Step-2 ModelSerializer
@@ -337,6 +343,8 @@ urlpatterns = [
 
 ## Instalando `httpie`
 
+Podemos usar o [curl][6], mas o [httpie][7] é mais amigável, e escrito em Python.
+
 ```bash
 $ sudo pip install httpie
 ```
@@ -345,12 +353,54 @@ Vamos usar o `httpie` digitando
 
 ```bash
 $ http http://127.0.0.1:8000/persons/
+
+HTTP/1.0 200 OK
+Content-Type: application/json
+Date: Sun, 15 Nov 2015 03:24:44 GMT
+Server: WSGIServer/0.2 CPython/3.4.3
+X-Frame-Options: SAMEORIGIN
+
+[
+    {
+        "active": true, 
+        "created": "2015-11-15T03:20:24.938378Z", 
+        "email": "paul@email.com", 
+        "first_name": "Paul", 
+        "last_name": "Van Dyke", 
+        "pk": 1
+    }, 
+    {
+        "active": true, 
+        "created": "2015-11-15T03:20:25.084990Z", 
+        "email": "regis@email.com", 
+        "first_name": "Regis", 
+        "last_name": "Santos", 
+        "pk": 2
+    }
+]
+```
+
+Veja os detalhes
+
+```bash
+$ http http://127.0.0.1:8000/persons/1/
+```
+
+> **Atenção**: se você receber erro 301, muito provavelmente é porque você esqueceu da barra `/` no final da url.
+
+
+### Como seria em curl?
+
+Assim
+
+```bash
+$ curl http://127.0.0.1:8000/persons/
+
+[{"pk":1,"first_name":"Paul","last_name":"Van Dyke","email":"paul@email.com","active":true,"created":"2015-11-15T03:20:24.938378Z"},{"pk":2,"first_name":"Regis","last_name":"Santos","email":"regis@email.com","active":true,"created":"2015-11-15T03:20:25.084990Z"}]
 ```
 
 
-
-
-
+GitHub: Se você quiser pode olhar meu [GitHub][8], mas terá que ver os *commits* para ver os passos.
 
 [0]: http://www.django-rest-framework.org/
 [1]: https://github.com/hugobrilhante/drf-tutorial-pybr11
@@ -358,3 +408,6 @@ $ http http://127.0.0.1:8000/persons/
 [3]: https://www.djangoproject.com/
 [4]: http://pythonclub.com.br/tutorial-django-17.html
 [5]: https://pt.wikipedia.org/wiki/Serializa%C3%A7%C3%A3o
+[6]: http://curl.haxx.se/
+[7]: https://github.com/jakubroztocil/httpie#installation
+[8]: https://github.com/rg3915/drf.git
