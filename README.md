@@ -26,14 +26,14 @@ $ virtualenv env # python 2, ou
 $ # virtualenv -p python3 env # python 3
 $ source env/bin/activate
 $ mkdir drf; cd drf
-$ django-admin.py startproject myproject .
-$ python manage.py core
-$ pip install Django==1.8.6 djangorestframework==3.3.1
+$ pip install django==1.8.6 djangorestframework==3.3.1
 $ pip install django-filter drf-nested-routers
 $ pip freeze > requirements.txt
+$ django-admin.py startproject myproject .
+$ python manage.py startapp core
 ```
 
-Veja o requirements.txt
+Veja o meu requirements.txt
 
 	Django==1.8.6
 	django-filter==0.11.0
@@ -84,6 +84,7 @@ class Person(models.Model):
 Precisamos proporcionar uma forma de [serialização][5] e desserialização das instâncias de `person` em uma representação JSON.
 
 ```bash
+$ cd core/
 $ touch serializers.py
 ```
 
