@@ -58,6 +58,7 @@ target/
 
 *.sqlite3
 *.pyc
+.venv
 
 bin/
 include/

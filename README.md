@@ -6,11 +6,11 @@ Eu resolvi estudar um pouco mais de [DRF][0] depois do tutorial do [Hugo Brilhan
 
 Pra quem não sabe, para usar API Web usamos REST, no caso, [Django Rest Framework][0], framework web do [Django][3].
 
-> **Nota:** este tutorial não é exatamente igual ao do Hugo, é baseado nele.
+> **Nota:** este tutorial não é exatamente igual ao do Hugo, é baseado nele. E baseado também em [Tutorial 1: Serialization][9].
 
 Então para criar a API, no meu caso, eu usei:
 
-* Ambiente: env
+* Ambiente: .venv
 * Projeto: myproject
 * App: core
 * Model: Person
@@ -22,9 +22,9 @@ Então para criar a API, no meu caso, eu usei:
 ## Configurando um novo ambiente
 
 ```bash
-$ virtualenv env # python 2, ou
-$ # virtualenv -p python3 env # python 3
-$ source env/bin/activate
+$ virtualenv .venv # python 2, ou
+$ # virtualenv -p python3 .venv # python 3
+$ source .venv/bin/activate
 $ mkdir drf; cd drf
 $ pip install django==1.8.6 djangorestframework==3.3.1
 $ pip install django-filter drf-nested-routers
@@ -35,11 +35,12 @@ $ python manage.py startapp core
 
 Veja o meu requirements.txt
 
-	Django==1.8.6
-	django-filter==0.11.0
-	djangorestframework==3.3.1
-	drf-nested-routers==0.10.0
-
+```bash
+Django==1.8.6
+django-filter==0.11.0
+djangorestframework==3.3.1
+drf-nested-routers==0.10.0
+```
 ## Step-0 Projeto inicial
 
 Abra o arquivo `settings.py` e em `INSTALLED_APPS` acrescente
@@ -412,3 +413,4 @@ GitHub: Se você quiser pode olhar meu [GitHub][8], mas terá que ver os *commit
 [6]: http://curl.haxx.se/
 [7]: https://github.com/jakubroztocil/httpie#installation
 [8]: https://github.com/rg3915/drf.git
+[9]: http://www.django-rest-framework.org/tutorial/1-serialization/
