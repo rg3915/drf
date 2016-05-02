@@ -1,6 +1,6 @@
 # Django Rest Framework trainning and tests
 
-Eu resolvi estudar um pouco mais de [DRF][0] depois do tutorial do [Hugo Brilhante][1] na [Python Brasil][2].
+Eu resolvi estudar um pouco mais de [DRF][0] depois do tutorial do [Hugo Brilhante][1] na [Python Brasil 11][2].
 
 > **Obs**: se você não sabe Django sugiro que leia este [tutorial][4] antes.
 
@@ -22,11 +22,10 @@ Então para criar a API, no meu caso, eu usei:
 ## Configurando um novo ambiente
 
 ```bash
-$ virtualenv .venv # python 2, ou
-$ # virtualenv -p python3 .venv # python 3
+$ virtualenv -p python3 .venv
 $ source .venv/bin/activate
 $ mkdir drf; cd drf
-$ pip install django==1.8.6 djangorestframework==3.3.1
+$ pip install django==1.9.5 djangorestframework==3.3.3
 $ pip install django-filter drf-nested-routers
 $ pip freeze > requirements.txt
 $ django-admin.py startproject myproject .
@@ -36,9 +35,9 @@ $ python manage.py startapp core
 Veja o meu requirements.txt
 
 ```bash
-Django==1.8.6
+Django==1.9.5
 django-filter==0.11.0
-djangorestframework==3.3.1
+djangorestframework==3.3.3
 drf-nested-routers==0.10.0
 ```
 ## Step-0 Projeto inicial
