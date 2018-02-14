@@ -18,27 +18,43 @@ Então para criar a API, no meu caso, eu usei:
 
 ![img](img/person.jpg)
 
+## Clonando o projeto
+
+```bash
+$ git clone https://github.com/rg3915/drf.git
+$ cd drf
+$ python3 -m venv .venv
+$ source .venv/bin/activate
+$ pip install -r requirements.txt
+$ python contrib/env_gen.py
+$ python manage.py migrate
+```
+
 
 ## Configurando um novo ambiente
 
 ```bash
-$ virtualenv -p python3 .venv
+$ python3 -m venv .venv
 $ source .venv/bin/activate
 $ mkdir drf; cd drf
-$ pip install django==1.9.5 djangorestframework==3.3.3
+$ pip install django==2.0.2 djangorestframework==3.7.7
 $ pip install django-filter drf-nested-routers
 $ pip freeze > requirements.txt
 $ django-admin.py startproject myproject .
 $ python manage.py startapp core
+$ python contrib/env_gen.py
 ```
 
 Veja o meu requirements.txt
 
 ```bash
-Django==1.9.5
-django-filter==0.11.0
-djangorestframework==3.3.3
-drf-nested-routers==0.10.0
+dj-database-url==0.4.2
+Django==2.0.2
+django-extensions==1.9.9
+django-filter==1.1.0
+djangorestframework==3.7.7
+drf-nested-routers==0.90.0
+python-decouple==3.1
 ```
 ## Step-0 Projeto inicial
 
